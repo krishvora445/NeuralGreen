@@ -8,6 +8,8 @@ from flask_cors import CORS
 from PIL import Image
 import numpy as np
 
+# Disable oneDNN to ensure consistent predictions across different CPUs
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 # Set environment variable to suppress TensorFlow logs before importing
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
