@@ -113,7 +113,7 @@ export default function Scanner({ lang, t, onResult }: ScannerProps) {
       let data: WasteData | null = null;
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
+        const timeout = setTimeout(() => controller.abort(), 30000);
         const res = await fetch('/api/predict', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -179,7 +179,7 @@ export default function Scanner({ lang, t, onResult }: ScannerProps) {
             let data: WasteData | null = null;
             try {
               const controller = new AbortController();
-              const timeout = setTimeout(() => controller.abort(), 5000);
+              const timeout = setTimeout(() => controller.abort(), 30000);
               const res = await fetch('/api/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

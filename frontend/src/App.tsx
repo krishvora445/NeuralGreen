@@ -50,7 +50,7 @@ export default function App() {
     const check = async () => {
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3000);
+        const timeout = setTimeout(() => controller.abort(), 15000);
         const res = await fetch('/api/health', { signal: controller.signal });
         clearTimeout(timeout);
         if (res.ok) {
