@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Upload, Camera, Loader2, AlertCircle, Video, VideoOff, Zap } from 'lucide-react';
 import type { WasteData } from '../lib/wasteData';
-import { getMockPrediction } from '../lib/wasteData';
 import type { Lang } from '../lib/i18n';
 import { pick, speak as speakFn } from '../lib/utils';
 import ResultCard from './ResultCard';
@@ -109,30 +108,21 @@ export default function Scanner({ lang, t, onResult }: ScannerProps) {
     if (!img) return;
     setState('loading');
     try {
-      // Try Flask server first (proxied through Vite /api)
-      let data: WasteData | null = null;
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000);
-        const res = await fetch('/api/predict', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: img }),
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
-        if (res.ok) {
-          data = await res.json();
-        }
-      } catch {
-        // Flask offline, use mock
+      // Try Flask server (proxied through Vite/Vercel /api)
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 60000);
+      const res = await fetch('/api/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: img }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Server error (${res.status}): ${errBody}`);
       }
-
-      if (!data) {
-        // Simulate a small delay for mock
-        await new Promise(r => setTimeout(r, 800));
-        data = getMockPrediction();
-      }
+      const data: WasteData = await res.json();
 
       setResult(data);
       setState('result');
@@ -142,6 +132,7 @@ export default function Scanner({ lang, t, onResult }: ScannerProps) {
       speakFn(pick(data.voice, lang), lang);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Analysis failed';
+      console.error('Prediction error:', msg);
       setErrorMsg(msg);
       setState('error');
     }
@@ -176,28 +167,26 @@ export default function Scanner({ lang, t, onResult }: ScannerProps) {
         // Direct analyse with the captured base64
         (async () => {
           try {
-            let data: WasteData | null = null;
-            try {
-              const controller = new AbortController();
-              const timeout = setTimeout(() => controller.abort(), 30000);
-              const res = await fetch('/api/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: b64 }),
-                signal: controller.signal,
-              });
-              clearTimeout(timeout);
-              if (res.ok) data = await res.json();
-            } catch {}
-
-            if (!data) {
-              await new Promise(r => setTimeout(r, 500));
-              data = getMockPrediction();
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 60000);
+            const res = await fetch('/api/predict', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ image: b64 }),
+              signal: controller.signal,
+            });
+            clearTimeout(timeout);
+            if (!res.ok) {
+              console.error('Live prediction failed:', res.status);
+              return;
             }
+            const data: WasteData = await res.json();
             setResult(data);
             setState('result');
             onResult(data);
-          } catch {}
+          } catch (e) {
+            console.error('Live prediction error:', e);
+          }
         })();
       }
     }, 5000);
