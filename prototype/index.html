@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EcoScan — Smart Waste & Recycling Identifier</title>
+<link rel="stylesheet" href="style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="bg-mesh">
+  <div class="mesh-orb mo1"></div>
+  <div class="mesh-orb mo2"></div>
+  <div class="mesh-orb mo3"></div>
+  <div class="grid-overlay"></div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header id="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M14 20c0-3.314 2.686-6 6-6s6 2.686 6 6-2.686 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M20 26v-4M20 14v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="2" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">EcoScan</span>
+        <span class="logo-tagline">AI Waste Identifier</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="#scanner" class="nav-link">Scanner</a>
+      <a href="#guide"   class="nav-link">Guide</a>
+      <a href="#rewards" class="nav-link">Rewards</a>
+      <a href="#history" class="nav-link">History</a>
+      <div style="text-align:center;padding:10px">
+  <button onclick="resetDemo()" style="
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.1);
+    color:rgba(255,255,255,0.2);
+    padding:6px 16px;
+    border-radius:6px;
+    font-size:0.7rem;
+    cursor:pointer;">
+    Reset Demo Data
+  </button>
+</div>
+    </nav>
+
+    <div class="header-right">
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="hi">🇮🇳 HI</button>
+        <button class="lang-btn" data-lang="gu">🏛️ GU</button>
+      </div>
+      <!-- Mini points -->
+      <div class="mini-points">⭐ <span id="miniPoints">0 pts</span></div>
+      <!-- Server status -->
+      <div class="server-status" id="serverStatus">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Connecting…</span>
+      </div>
+      <!-- Theme toggle -->
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <span class="theme-icon">☀️</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      PS-02 · Smart E-Waste &amp; Bio-Waste Identifier
+    </div>
+    <h1 class="hero-title" id="heroTitle">
+      Scan Waste.<br/><em>Recycle Right.</em>
+    </h1>
+    <p class="hero-desc" id="heroDesc">
+      Upload a photo or use your camera — our computer vision AI instantly identifies waste categories and tells you exactly how to dispose of each item responsibly.
+    </p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">12</span><span class="stat-label">Waste Categories</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">85%+</span><span class="stat-label">AI Accuracy</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">Real-time</span><span class="stat-label">Detection</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="scan-animation">
+      <div class="scan-ring sr1"></div>
+      <div class="scan-ring sr2"></div>
+      <div class="scan-ring sr3"></div>
+      <div class="scan-center">♻</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCANNER ═══ -->
+<section class="scanner-section" id="scanner">
+  <div class="section-header">
+    <h2 class="section-title">Waste Scanner</h2>
+    <p class="section-sub">Upload an image or use your camera to identify waste type</p>
+  </div>
+
+  <div class="scanner-layout">
+    <!-- Input panel -->
+    <div class="input-panel">
+      <div class="tab-bar">
+        <button class="tab active" id="tabUpload" onclick="switchTab('upload')">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7M10 7L7 10M10 7l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span id="lblUploadTab">Upload Image</span>
+        </button>
+        <button class="tab" id="tabCamera" onclick="switchTab('camera')">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M2 7a2 2 0 012-2h.5l1-2h9l1 2H17a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="11" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span id="lblCameraTab">Camera</span>
+        </button>
+      </div>
+
+      <!-- Upload panel -->
+      <div class="panel" id="panelUpload">
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-icon">
+            <svg viewBox="0 0 64 64" fill="none">
+              <rect x="8" y="16" width="48" height="36" rx="4" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M24 28l8-8 8 8M32 20v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20 44h24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+            </svg>
+          </div>
+          <p class="drop-title" id="lblDropTitle">Drag &amp; drop waste image</p>
+          <p class="drop-sub"   id="lblDropSub">or click to browse files</p>
+          <label class="btn btn-primary" for="fileInput" id="lblChooseFile">Choose Image</label>
+          <input type="file" id="fileInput" accept="image/*" hidden/>
+          <p class="drop-formats">PNG · JPG · WEBP · up to 10MB</p>
+        </div>
+      </div>
+
+      <!-- Camera panel -->
+      <div class="panel hidden" id="panelCamera">
+        <div class="camera-wrap hidden" id="cameraWrap">
+          <video id="cameraFeed" autoplay playsinline muted></video>
+          <div class="camera-overlay">
+            <div class="scan-frame">
+              <span class="sf-tl"></span><span class="sf-tr"></span>
+              <span class="sf-bl"></span><span class="sf-br"></span>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+          <div class="camera-controls">
+            <button class="btn btn-primary" id="captureBtn">📸 <span id="lblCapture">Capture</span></button>
+            <button class="btn btn-outline"  id="stopCameraBtn">✕ <span id="lblStop">Stop</span></button>
+          </div>
+        </div>
+        <div class="camera-start" id="cameraStart">
+          <div class="camera-icon">📷</div>
+          <p id="lblCameraPermission">Allow camera access to scan waste in real-time</p>
+          <button class="btn btn-primary" id="startCameraBtn" id="lblStartCamera">Start Camera</button>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-panel hidden" id="previewPanel">
+        <div class="preview-header">
+          <span class="preview-label">Selected Image</span>
+          <button class="btn-icon" id="clearBtn" title="Clear">✕</button>
+        </div>
+        <div class="preview-img-wrap">
+          <img id="previewImg" src="" alt="Preview"/>
+          <div class="preview-badge" id="previewBadge">Ready to scan</div>
+        </div>
+        <button class="btn btn-primary btn-full" id="analyzeBtn">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span id="lblAnalyse">Analyse Waste</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Result panel -->
+    <div class="result-panel">
+
+      <!-- Empty -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🔍</div>
+        <h3 id="lblReady">Ready to Identify</h3>
+        <p id="lblReadySub">Upload an image or use your camera to get started.</p>
+        <div class="empty-categories">
+          <span>📦 Cardboard</span><span>🫙 Glass</span><span>🥫 Metal</span>
+          <span>📄 Paper</span><span>🧴 Plastic</span><span>🥦 Biological</span>
+          <span>🔋 Battery</span><span>👕 Clothes</span><span>👟 Shoes</span><span>🗑️ Trash</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-state hidden" id="loadingState">
+        <div class="ai-loader">
+          <div class="loader-ring lr1"></div>
+          <div class="loader-ring lr2"></div>
+          <div class="loader-ring lr3"></div>
+          <span class="loader-icon">🧠</span>
+        </div>
+        <h3 id="lblAnalysing">Analysing Waste…</h3>
+        <div class="loading-steps">
+          <div class="lstep active" id="ls1">🖼️ Processing image</div>
+          <div class="lstep" id="ls2">🔬 Running AI model</div>
+          <div class="lstep" id="ls3">📊 Generating results</div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="result-state hidden" id="resultState">
+        <div class="result-top">
+          <div class="result-emoji" id="resultEmoji"></div>
+          <div class="result-info">
+            <div class="result-category-badge" id="resultCategoryBadge"></div>
+            <h2 class="result-name" id="resultName"></h2>
+            <div class="confidence-row">
+              <div class="conf-bar-wrap">
+                <div class="conf-bar"><div class="conf-fill" id="confFill"></div></div>
+              </div>
+              <span class="conf-pct" id="confPct"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bin + Voice -->
+        <div class="bin-speak-row">
+          <div class="bin-card" id="binCard">
+            <div class="bin-icon" id="binColorDot"></div>
+            <div class="bin-info">
+              <p class="bin-label" id="lblDisposalBin">Disposal Bin</p>
+              <p class="bin-name" id="binName"></p>
+            </div>
+          </div>
+          <button class="btn btn-outline speak-btn" id="speakBtn">
+            🔊 <span id="lblSpeak">Read Aloud</span>
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="result-tabs">
+          <button class="rtab active" onclick="showRTab('desc')"   id="lblDescTab">Description</button>
+          <button class="rtab"        onclick="showRTab('dos')"    id="lblDosTab">Do's &amp; Don'ts</button>
+          <button class="rtab"        onclick="showRTab('impact')" id="lblImpactTab">Impact</button>
+        </div>
+
+        <div class="rtab-content" id="rtabDesc">
+          <p class="result-description" id="resultDesc"></p>
+          <div class="tip-box">
+            <span class="tip-icon">💡</span>
+            <p id="resultTip"></p>
+          </div>
+        </div>
+        <div class="rtab-content hidden" id="rtabDos">
+          <div class="dos-donts">
+            <div class="dos"><h4 id="lblDo">✅ Do</h4><ul id="dosList"></ul></div>
+            <div class="donts"><h4 id="lblDont">❌ Don't</h4><ul id="dontsList"></ul></div>
+          </div>
+        </div>
+        <div class="rtab-content hidden" id="rtabImpact">
+          <div class="impact-box">
+            <span class="impact-icon">🌍</span>
+            <p id="resultImpact"></p>
+          </div>
+        </div>
+
+        <div class="top3-wrap">
+          <p class="top3-title" id="lblTop3">AI Confidence Breakdown</p>
+          <div id="top3List"></div>
+        </div>
+
+        <button class="btn btn-outline btn-full" id="scanAgainBtn">↩ <span id="lblScanAgain">Scan Another Item</span></button>
+      </div>
+
+      <!-- Error -->
+      <div class="error-state hidden" id="errorState">
+        <div class="error-icon">⚠️</div>
+        <h3>Analysis Failed</h3>
+        <p id="errorMsg"></p>
+        <div class="error-help">
+          <p>Make sure:</p>
+          <ul>
+            <li>Flask server is running (<code>python app.py</code>)</li>
+            <li>Server shows <code>Running on http://127.0.0.1:5000</code></li>
+            <li>Open website using Live Server not double-click</li>
+          </ul>
+        </div>
+        <button class="btn btn-primary" id="errorRetryBtn">Try Again</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ REWARDS ═══ -->
+<section class="rewards-section" id="rewards">
+  <div class="section-header">
+    <h2 class="section-title" id="lblRewardsTitle">Your Eco Rewards</h2>
+    <p class="section-sub">Earn points and badges by scanning and recycling waste correctly</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="sc-icon">⭐</div><div class="sc-num" id="statPoints">0</div><div class="sc-label" id="lblPointsLabel">Eco Points</div></div>
+    <div class="stat-card"><div class="sc-icon">🔍</div><div class="sc-num" id="statScans">0</div><div class="sc-label" id="lblScansLabel">Total Scans</div></div>
+    <div class="stat-card"><div class="sc-icon">🌿</div><div class="sc-num" id="statCO2">0</div><div class="sc-label" id="lblCO2Label">CO₂ Saved (g)</div></div>
+    <div class="stat-card"><div class="sc-icon">🏅</div><div class="sc-num" id="statBadges">0</div><div class="sc-label" id="lblBadgesLabel">Badges Earned</div></div>
+  </div>
+  <div class="badges-grid" id="badgesGrid"></div>
+</section>
+
+<!-- ═══ GUIDE ═══ -->
+<section class="guide-section" id="guide">
+  <div class="section-header">
+    <h2 class="section-title">Waste Categories Guide</h2>
+    <p class="section-sub">Learn how to properly sort and dispose of different waste types</p>
+  </div>
+  <div class="guide-grid">
+    <div class="guide-card" style="--cc:#8B6914"><div class="gc-emoji">📦</div><h3>Cardboard</h3><p>Flatten boxes, remove tape. Recyclable up to 7 times.</p><span class="gc-bin">Blue Recycling Bin</span></div>
+    <div class="guide-card" style="--cc:#4AA5D1"><div class="gc-emoji">🫙</div><h3>Glass</h3><p>Rinse clean, remove lids. 100% recyclable endlessly.</p><span class="gc-bin">Green Glass Bin</span></div>
+    <div class="guide-card" style="--cc:#78909C"><div class="gc-emoji">🥫</div><h3>Metal</h3><p>Rinse cans, crush to save space. Back on shelves in 60 days.</p><span class="gc-bin">Blue Recycling Bin</span></div>
+    <div class="guide-card" style="--cc:#E8C87A"><div class="gc-emoji">📄</div><h3>Paper</h3><p>Keep dry and clean. Newspapers, magazines accepted.</p><span class="gc-bin">Blue Recycling Bin</span></div>
+    <div class="guide-card" style="--cc:#EF5350"><div class="gc-emoji">🧴</div><h3>Plastic</h3><p>Check resin code (1–7). Rinse all containers first.</p><span class="gc-bin">Yellow Recycling Bin</span></div>
+    <div class="guide-card" style="--cc:#66BB6A"><div class="gc-emoji">🥦</div><h3>Biological</h3><p>Compost food and garden waste. Creates free fertiliser.</p><span class="gc-bin">Brown Compost Bin</span></div>
+    <div class="guide-card" style="--cc:#FF7043"><div class="gc-emoji">🔋</div><h3>Battery / E-Waste</h3><p>NEVER bin batteries. Take to e-waste collection points.</p><span class="gc-bin">E-Waste Collection Point</span></div>
+    <div class="guide-card" style="--cc:#AB47BC"><div class="gc-emoji">👕</div><h3>Clothes</h3><p>Donate if usable. Textile banks accept worn clothing too.</p><span class="gc-bin">Textile Recycling Bank</span></div>
+    <div class="guide-card" style="--cc:#7E57C2"><div class="gc-emoji">👟</div><h3>Shoes</h3><p>Donate or use shoe recycling at sports stores.</p><span class="gc-bin">Textile Recycling Bank</span></div>
+    <div class="guide-card" style="--cc:#546E7A"><div class="gc-emoji">🗑️</div><h3>General Waste</h3><p>Cannot be recycled. Reduce usage of non-recyclable items.</p><span class="gc-bin">Black General Waste Bin</span></div>
+  </div>
+</section>
+
+<!-- ═══ HISTORY ═══ -->
+<section class="history-section" id="history">
+  <div class="section-header">
+    <h2 class="section-title" id="lblHistoryTitle">Scan History</h2>
+    <p class="section-sub">Your recent waste scans — saved across sessions</p>
+    <button class="btn btn-outline btn-sm" id="clearHistoryBtn" id="lblClearHistory">Clear History</button>
+  </div>
+  <div class="history-empty" id="historyEmpty">
+    <p id="lblHistoryEmpty">No scans yet. Analyse a waste item to see your history here.</p>
+  </div>
+  <div class="history-grid" id="historyGrid"></div>
+</section>
+
+
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">♻ EcoScan</span>
+      <p>Smart Waste &amp; Recycling Identifier — PS-02</p>
+    </div>
+    <div class="footer-tech">
+      <span>MobileNetV2</span>
+      <span>TensorFlow</span>
+      <span>Flask</span>
+      <span>12 Categories</span>
+      <span>Web Speech API</span>
+    </div>
+  </div>
+</footer>
+<script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE"></script>
+<script src="app.js"></script>
+</body>
+</html>
