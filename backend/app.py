@@ -87,6 +87,25 @@ def health_check():
         "classes": list(class_labels.values()) if class_labels else []
     })
 
+@app.route('/model-check', methods=['GET'])
+def model_check():
+    import hashlib, sys
+    md5 = "N/A"
+    size = 0
+    if os.path.exists(MODEL_PATH):
+        with open(MODEL_PATH, 'rb') as f:
+            md5 = hashlib.md5(f.read()).hexdigest()
+        size = os.path.getsize(MODEL_PATH)
+    return jsonify({
+        "model_path": MODEL_PATH,
+        "model_exists": os.path.exists(MODEL_PATH),
+        "model_md5": md5,
+        "model_size_bytes": size,
+        "tf_version": tf.__version__,
+        "python_version": sys.version,
+        "labels": class_labels
+    })
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if model is None:
