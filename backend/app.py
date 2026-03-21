@@ -12,20 +12,26 @@ import numpy as np
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 # Set environment variable to suppress TensorFlow logs before importing
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import tensorflow as tf
-
-# Limit threads to save memory on Render's 512MB free tier
-tf.config.threading.set_inter_op_parallelism_threads(1)
-tf.config.threading.set_intra_op_parallelism_threads(1)
+try:
+    import tflite_runtime.interpreter as tflite
+    IS_TFLITE_RUNTIME = True
+except ImportError:
+    import tensorflow as tf
+    tflite = tf.lite
+    IS_TFLITE_RUNTIME = False
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    tf.config.threading.set_intra_op_parallelism_threads(1)
 
 app = Flask(__name__)
 # Enable CORS for frontend running on Vite's dev server (localhost:5173) defaults
 CORS(app)
 
-MODEL_PATH = "ewaste_model.h5"
+MODEL_PATH = "ewaste_model.tflite"
 LABELS_PATH = "class_labels.json"
 
-model = None
+interpreter = None
+input_details = None
+output_details = None
 class_labels = {}
 
 # ══════════════════════════════════════════════════════════════
@@ -53,7 +59,7 @@ DEFAULT_WASTE = {
 
 
 def load_model_file():
-    global model, class_labels
+    global interpreter, input_details, output_details, class_labels
     if not os.path.exists(MODEL_PATH):
         print(f"⚠️  {MODEL_PATH} not found.")
         return False
@@ -62,8 +68,11 @@ def load_model_file():
         return False
     
     print("Loading model…")
-    # Load the Keras model
-    model = tf.keras.models.load_model(MODEL_PATH)
+    # Load the TFLite model
+    interpreter = tflite.Interpreter(model_path=MODEL_PATH, num_threads=1)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
     
     # Load the class labels mapping
     with open(LABELS_PATH) as f:
@@ -89,7 +98,7 @@ load_model_file()
 def health_check():
     return jsonify({
         "status": "ok",
-        "model_loaded": model is not None,
+        "model_loaded": interpreter is not None,
         "classes": list(class_labels.values()) if class_labels else []
     })
 
@@ -107,14 +116,14 @@ def model_check():
         "model_exists": os.path.exists(MODEL_PATH),
         "model_md5": md5,
         "model_size_bytes": size,
-        "tf_version": tf.__version__,
+        "tf_version": "tflite_runtime" if IS_TFLITE_RUNTIME else tf.__version__,
         "python_version": sys.version,
         "labels": class_labels
     })
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if model is None:
+    if interpreter is None:
         return jsonify({"error": "Model not loaded."}), 503
         
     data = request.json
@@ -132,8 +141,10 @@ def predict():
         # Preprocess for the model
         img_array = preprocess(img_bytes)
         
-        # Run inference
-        preds = model.predict(img_array, verbose=0)[0]
+        # Run inference via TFLite
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()
+        preds = interpreter.get_tensor(output_details[0]['index'])[0]
         
         # Get the top prediction
         top_idx = int(np.argmax(preds))
