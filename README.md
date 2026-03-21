@@ -1,179 +1,240 @@
-╔══════════════════════════════════════════════════════════════════╗
-║           NEURALGREEN — COMPLETE SETUP GUIDE                     ║
-║           PS-02: Smart Waste & Recycling Identifier              ║
-╚══════════════════════════════════════════════════════════════════╝
+<div align="center">
 
-YOUR PROJECT STRUCTURE:
-───────────────────────
+<img src="https://img.shields.io/badge/NeuralGreen-PS--02-2d6a4f?style=for-the-badge&logo=leaf&logoColor=white" alt="NeuralGreen" height="40"/>
+
+# 🌿 NeuralGreen — Smart Waste & Recycling Identifier
+
+**AI-powered waste classification to make recycling effortless and rewarding.**
+
+[![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-5001-000000?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5173-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-Keras-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)](https://tensorflow.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+  - [Step 1 — Install Python Dependencies](#step-1--install-python-dependencies)
+  - [Step 2 — Run the Backend](#step-2--run-the-backend)
+  - [Step 3 — Run the Frontend](#step-3--run-the-frontend)
+  - [Step 4 — AI Model Setup](#step-4--ai-model-setup-if-missing)
+- [Waste Categories](#-waste-categories)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Troubleshooting](#-troubleshooting)
+
+---
+
+## 🌱 Overview
+
+NeuralGreen PS-02 is a full-stack AI application that identifies waste types from images and provides intelligent disposal guidance. Point your camera at any waste item and get instant classification, recycling instructions, environmental impact data, and eco-points — all in your language.
+
+---
+
+## 📁 Project Structure
+
+```
 NeuralGreen/
 ├── backend/
-│   ├── app.py              ← Flask AI server (run this)
-│   ├── run.py              ← Alternative entry point
-│   ├── requirements.txt    ← Python dependencies
-│   ├── ewaste_model.h5     ← Keras/TensorFlow model
-│   ├── best.pt             ← YOLO model (alternative)
-│   └── class_labels.json   ← Waste class label map
+│   ├── app.py                  ← Flask AI server (run this)
+│   ├── run.py                  ← Alternative entry point
+│   ├── requirements.txt        ← Python dependencies
+│   ├── ewaste_model.h5         ← Keras/TensorFlow model (224×224)
+│   ├── best.pt                 ← YOLO model (alternative)
+│   └── class_labels.json       ← Waste class label map
+│
 └── frontend/
     ├── src/
-    │   ├── App.tsx          ← Root React component
-    │   ├── components/      ← Scanner, ResultCard, Guide, Rewards, History, Header
-    │   └── lib/             ← i18n, gamification, wasteData, utils
+    │   ├── App.tsx              ← Root React component
+    │   ├── components/          ← Scanner, ResultCard, Guide, Rewards, History, Header
+    │   └── lib/                 ← i18n, gamification, wasteData, utils
     ├── package.json
-    └── vite.config.ts       ← Vite dev server (proxies /api → localhost:5001)
+    └── vite.config.ts           ← Proxies /api → localhost:5001
+```
 
+---
 
-════════════════════════════════════════
-STEP 1 — INSTALL PYTHON DEPENDENCIES
-════════════════════════════════════════
+## 🚀 Getting Started
 
-Open Command Prompt (Win + R → type cmd → Enter)
-Navigate to the backend folder:
+### Step 1 — Install Python Dependencies
 
-    cd path\to\NeuralGreen\backend
+Open **Command Prompt** and navigate to the backend folder:
 
-Install required libraries:
+```bash
+cd path\to\NeuralGreen\backend
+```
 
-    pip install -r requirements.txt
+Install all required libraries:
 
-Or manually:
+```bash
+pip install -r requirements.txt
+```
 
-    pip install flask flask-cors pillow numpy tensorflow
+> Or install manually:
+> ```bash
+> pip install flask flask-cors pillow numpy tensorflow
+> ```
 
+---
 
-════════════════════════════════════════
-STEP 2 — RUN THE BACKEND SERVER
-════════════════════════════════════════
+### Step 2 — Run the Backend
 
-Inside the backend folder, start the Flask server:
+Still inside the `backend/` folder, start the Flask server:
 
-    python app.py
+```bash
+python app.py
+```
 
-Or use the alternative entry point:
-
-    python run.py
+> **Alternative entry point:**
+> ```bash
+> python run.py
+> ```
 
 You should see:
-    Starting NeuralGreen Backend Server...
-    ✅ Model loaded. Classes: ['battery', 'biological', 'brown-glass', ...]
-    * Running on http://0.0.0.0:5001
 
-⚠️  KEEP THIS WINDOW OPEN — do not close it!
+```
+Starting NeuralGreen Backend Server...
+✅ Model loaded. Classes: ['battery', 'biological', 'brown-glass', ...]
+ * Running on http://0.0.0.0:5001
+```
 
-Backend API endpoints:
-    GET  http://localhost:5001/health   ← Model status check
-    POST http://localhost:5001/predict  ← Accepts base64 image, returns prediction
+> ⚠️ **Keep this terminal window open** — the backend must stay running.
 
+**API Endpoints:**
 
-════════════════════════════════════════
-STEP 3 — RUN THE FRONTEND
-════════════════════════════════════════
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/health` | Model status check |
+| `POST` | `/predict` | Accepts base64 image, returns prediction |
 
-Open a NEW Command Prompt window and navigate to the frontend folder:
+---
 
-    cd path\to\NeuralGreen\frontend
+### Step 3 — Run the Frontend
 
-Install Node dependencies (first time only):
+Open a **new terminal window** and navigate to the frontend folder:
 
-    npm install
+```bash
+cd path\to\NeuralGreen\frontend
+```
+
+Install Node dependencies *(first time only)*:
+
+```bash
+npm install
+```
 
 Start the Vite dev server:
 
-    npm run dev
+```bash
+npm run dev
+```
 
-Open your browser and go to:
+Then open your browser at:
 
-    http://localhost:5173
+```
+http://localhost:5173
+```
 
-You should see a GREEN dot saying "Model Ready" ✅
+You should see a 🟢 **"Model Ready"** indicator in the top bar.
 
-Note: The frontend automatically proxies all /api/* requests to the
-backend at http://localhost:5001 via Vite's proxy config.
+> The frontend automatically proxies all `/api/*` requests to `http://localhost:5001` via Vite's proxy config.
 
+---
 
-════════════════════════════════════════
-STEP 4 — AI MODEL (IF NOT PRESENT)
-════════════════════════════════════════
+### Step 4 — AI Model Setup *(if missing)*
 
-If ewaste_model.h5 or class_labels.json are missing, train on Google Colab:
+If `ewaste_model.h5` or `class_labels.json` are missing from the `backend/` folder, train the model on Google Colab:
 
-1. Go to: https://colab.research.google.com
-2. Click "New Notebook"
-3. Enable GPU: Runtime → Change runtime type → T4 GPU → Save
-4. Train the model and download:
-   - ewaste_model.h5
-   - class_labels.json
-5. Place both files inside: NeuralGreen/backend/
+1. Go to [colab.research.google.com](https://colab.research.google.com) → **New Notebook**
+2. Enable GPU: `Runtime → Change runtime type → T4 GPU → Save`
+3. Train the model and download both files:
+   - `ewaste_model.h5`
+   - `class_labels.json`
+4. Place both files inside `NeuralGreen/backend/`
 
-The model classifies 12 waste categories:
-    battery, biological, brown-glass, cardboard, clothes,
-    green-glass, metal, paper, plastic, shoes, trash, white-glass
+---
 
+## 🗂️ Waste Categories
 
-════════════════════════════════════════
-FEATURES
-════════════════════════════════════════
+The model classifies **12 waste categories**:
 
-✅ Upload image from PC (drag & drop or file picker)
-✅ Live camera scanning — capture snapshot or enable Live Mode
-✅ Live Mode — auto-scans every 5 seconds with real-time results
-✅ Voice Search — speak a waste item name to get disposal info
-✅ Text-to-Speech — results read aloud in the selected language
-✅ Multilingual — English, Hindi (हिंदी), Gujarati (ગુજરાતી)
-✅ 12 waste categories with bin colour + disposal instructions
-✅ Full recycling description per category
-✅ Do's and Don'ts for each waste type
-✅ Environmental impact facts per category
-✅ AI confidence percentage + top 3 predictions breakdown
-✅ Scan history — last 20 scans saved across sessions
-✅ Gamification — Eco Points, CO₂ saved tracker, badge system
-✅ 6 unlockable badges (First Step, Eco Starter, Green Warrior, etc.)
-✅ Waste Disposal Guide panel
-✅ Dark / Light mode toggle
-✅ Offline fallback — uses mock prediction if server is unreachable
+| Category | Category | Category |
+|----------|----------|----------|
+| 🔋 Battery | 🌿 Biological | 🟤 Brown Glass |
+| 📦 Cardboard | 👕 Clothes | 🟢 Green Glass |
+| 🔩 Metal | 📄 Paper | 🧴 Plastic |
+| 👟 Shoes | 🗑️ Trash | ⬜ White Glass |
 
+---
 
-════════════════════════════════════════
-TECH STACK
-════════════════════════════════════════
+## ✨ Features
 
-Backend:
-    Python 3.x, Flask, Flask-CORS
-    TensorFlow / Keras (ewaste_model.h5, 224×224 input)
-    Pillow, NumPy
-    Runs on port 5001
+| Feature | Description |
+|---------|-------------|
+| 📸 **Image Upload** | Drag & drop or file picker from your device |
+| 📷 **Live Camera Scan** | Capture snapshot or enable auto-scan every 5s |
+| 🎙️ **Voice Search** | Speak a waste item name to get disposal info |
+| 🔊 **Text-to-Speech** | Results read aloud in selected language |
+| 🌐 **Multilingual** | English, Hindi (हिंदी), Gujarati (ગુજરાતી) |
+| 🎯 **AI Confidence** | Percentage score + top 3 predictions breakdown |
+| ♻️ **Disposal Guide** | Bin colour, instructions, Do's & Don'ts per category |
+| 🌍 **Eco Impact** | Environmental impact facts per waste type |
+| 📜 **Scan History** | Last 20 scans saved across sessions |
+| 🏅 **Gamification** | Eco Points, CO₂ saved tracker, 6 unlockable badges |
+| 🌗 **Dark / Light Mode** | Toggle between themes |
+| 📡 **Offline Fallback** | Mock prediction if server is unreachable |
 
-Frontend:
-    React 19 + TypeScript
-    Vite 7 (dev server on port 5173)
-    Tailwind CSS v4
-    Lucide React (icons)
-    Browser Web Speech API (voice search + TTS)
+**Unlockable Badges:** First Step · Eco Starter · Green Warrior · and more
 
+---
 
-════════════════════════════════════════
-TROUBLESHOOTING
-════════════════════════════════════════
+## 🛠️ Tech Stack
 
-Problem: Red dot "Server Offline"
-Fix: Make sure app.py is running in CMD on port 5001
+**Backend**
 
-Problem: "Model not loaded" in health check
-Fix: Ensure ewaste_model.h5 and class_labels.json are in the backend folder
+| Technology | Role |
+|------------|------|
+| Python 3.x | Runtime |
+| Flask + Flask-CORS | REST API server (port 5001) |
+| TensorFlow / Keras | Model inference (`ewaste_model.h5`, 224×224 input) |
+| Pillow + NumPy | Image preprocessing |
 
-Problem: pip is not recognized
-Fix: Install Python from https://python.org
-     During install → check "Add Python to PATH"
+**Frontend**
 
-Problem: tensorflow install fails
-Fix: Try: pip install tensorflow-cpu
+| Technology | Role |
+|------------|------|
+| React 19 + TypeScript | UI framework |
+| Vite 7 | Dev server (port 5173) |
+| Tailwind CSS v4 | Styling |
+| Lucide React | Icons |
+| Web Speech API | Voice search + text-to-speech |
 
-Problem: npm not found
-Fix: Install Node.js from https://nodejs.org (LTS version)
+---
 
-Problem: Camera not working
-Fix: Open the app via http://localhost:5173 (not file://)
-     Camera APIs require a localhost or HTTPS origin
+## 🔧 Troubleshooting
 
-Problem: Voice search not working
-Fix: Allow microphone permissions in the browser
-     Use Chrome or Edge (Firefox has limited Web Speech API support)
+| Problem | Fix |
+|---------|-----|
+| 🔴 **"Server Offline"** red dot | Make sure `app.py` is running on port `5001` |
+| ❌ **"Model not loaded"** | Ensure `ewaste_model.h5` and `class_labels.json` are in `backend/` |
+| ❌ **`pip` not recognized** | [Install Python](https://python.org) and check **"Add Python to PATH"** during setup |
+| ❌ **TensorFlow install fails** | Try `pip install tensorflow-cpu` instead |
+| ❌ **`npm` not found** | [Install Node.js LTS](https://nodejs.org) |
+| 📷 **Camera not working** | Open via `http://localhost:5173`, not `file://` — camera needs localhost or HTTPS |
+| 🎙️ **Voice search not working** | Allow microphone permissions; use **Chrome** or **Edge** (Firefox has limited Web Speech API support) |
+
+---
+
+<div align="center">
+
+Made with 💚 for a greener planet · **NeuralGreen PS-02**
+
+</div>
