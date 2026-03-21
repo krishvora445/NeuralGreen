@@ -1,6 +1,6 @@
 flask
 flask-cors
 pillow
-numpy
+numpy<2.0.0
 tflite-runtime
 gunicorn
