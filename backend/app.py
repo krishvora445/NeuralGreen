@@ -14,6 +14,10 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 
+# Limit threads to save memory on Render's 512MB free tier
+tf.config.threading.set_inter_op_parallelism_threads(1)
+tf.config.threading.set_intra_op_parallelism_threads(1)
+
 app = Flask(__name__)
 # Enable CORS for frontend running on Vite's dev server (localhost:5173) defaults
 CORS(app)
