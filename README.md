@@ -6,6 +6,9 @@
 
 **AI-powered waste classification to make recycling effortless and rewarding.**
 
+🚀 **Live Demo:** [https://neuralgreen.vercel.app/](https://neuralgreen.vercel.app/)
+
+![NeuralGreen Demo](demo.png)
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-5001-000000?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
@@ -47,17 +50,21 @@ NeuralGreen/
 │   ├── app.py                  ← Flask AI server (run this)
 │   ├── run.py                  ← Alternative entry point
 │   ├── requirements.txt        ← Python dependencies
-│   ├── ewaste_model.h5         ← Keras/TensorFlow model (224×224)
+│   ├── ewaste_model.tflite     ← Ultra-light TFLite model for production
+│   ├── ewaste_model.h5         ← Keras/TensorFlow model (local development)
 │   ├── best.pt                 ← YOLO model (alternative)
 │   └── class_labels.json       ← Waste class label map
 │
-└── frontend/
-    ├── src/
-    │   ├── App.tsx              ← Root React component
-    │   ├── components/          ← Scanner, ResultCard, Guide, Rewards, History, Header
-    │   └── lib/                 ← i18n, gamification, wasteData, utils
-    ├── package.json
-    └── vite.config.ts           ← Proxies /api → localhost:5001
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx              ← Root React component
+│   │   ├── components/          ← Scanner, ResultCard, Guide, Rewards, History, Header
+│   │   └── lib/                 ← i18n, gamification, wasteData, utils
+│   ├── package.json             ← Node dependencies
+│   ├── vercel.json              ← Vercel production deployment config
+│   └── vite.config.ts           ← Dev server config
+│
+└── render.yaml                  ← Render backend deployment config
 ```
 
 ---
